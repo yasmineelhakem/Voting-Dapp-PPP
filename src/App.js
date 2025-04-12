@@ -3,6 +3,10 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { LandingPage } from './components/LandingPage';
 import { AuthForm } from './components/AuthForm';
 import { VotingPage } from './components/VotingPage';
+import { CandidatesPage } from './components/CandidatesPage';
+import { candidatesList } from './data/CandidatesList';
+import { Res } from './components/LiveResults';
+
 
 function App() {
   const [auth, setAuth] = useState({
@@ -13,6 +17,11 @@ function App() {
     email: '',
     password: ''
   });
+
+  const [candidates, setCandidates] = useState(candidatesList);
+
+  const [hasVoted, setHasVoted] = useState(false);
+  const [selectedCandidate, setSelectedCandidate] = useState(null);
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -35,6 +44,16 @@ function App() {
       ...formData,
       [e.target.name]: e.target.value
     });
+  };
+
+  const handleVote = () => {
+    if (selectedCandidate === null) return;
+    setCandidates(candidates.map(candidate =>
+      candidate.id === selectedCandidate
+        ? { ...candidate, votes: candidate.votes + 1 }
+        : candidate
+    ));
+    setHasVoted(true);
   };
 
 
@@ -60,8 +79,29 @@ function App() {
                                           handleInputChange={handleInputChange}
                                           handleSubmit={handleRegister}/>} />
 
-        <Route path="/vote" element={<VotingPage />} />
+        <Route path="/vote" element={<VotingPage
+                                      candidates={candidates}
+                                      selectedCandidate={selectedCandidate}
+                                      hasVoted={hasVoted}
+                                      setSelectedCandidate={setSelectedCandidate}
+                                      handleVote={handleVote}
+                                      setAuth={setAuth}
+                                     />} />
+
+        <Route path="/Candidates" element={<CandidatesPage
+                                            candidates={candidates} />} />
+                                            
+        <Route path="/res" element={<Res
+                                            candidates={candidates}
+                                            selectedCandidate={selectedCandidate}
+                                            hasVoted={hasVoted}
+                                            setSelectedCandidate={setSelectedCandidate}
+                                            handleVote={handleVote}
+                                            setAuth={setAuth}
+                                                    />} />
+
       </Routes>
+
     </Router>
   );
 }
