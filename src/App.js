@@ -4,8 +4,10 @@ import { LandingPage } from './components/LandingPage';
 import { AuthForm } from './components/AuthForm';
 import { VotingPage } from './components/VotingPage';
 import { CandidatesPage } from './components/CandidatesPage';
-import { candidatesList } from './data/CandidatesList';
+import { candidatesList } from './constants/CandidatesList';
 import { Res } from './components/LiveResults';
+import { MetaMaskLogin } from './components/ConnectWallet';
+
 
 
 function App() {
@@ -56,6 +58,9 @@ function App() {
     setHasVoted(true);
   };
 
+  const connectToMetamask = () => {
+
+  };
 
 
   return (
@@ -90,7 +95,7 @@ function App() {
 
         <Route path="/Candidates" element={<CandidatesPage
                                             candidates={candidates} />} />
-                                            
+
         <Route path="/res" element={<Res
                                             candidates={candidates}
                                             selectedCandidate={selectedCandidate}
@@ -99,6 +104,8 @@ function App() {
                                             handleVote={handleVote}
                                             setAuth={setAuth}
                                                     />} />
+
+        <Route path="/logmeta" element={<MetaMaskLogin connectWallet = {connectToMetamask}   />} />
 
       </Routes>
 

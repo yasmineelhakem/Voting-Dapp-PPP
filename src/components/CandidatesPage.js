@@ -1,7 +1,11 @@
 import React from 'react';
 import { Vote, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export const CandidatesPage = ({ candidates }) => {
+
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 py-8">
       <div className="container mx-auto px-4">
@@ -31,7 +35,7 @@ export const CandidatesPage = ({ candidates }) => {
 
         <div className="flex justify-center mt-8">
           <button
-            //onClick={}
+            onClick={() => navigate("/vote")}
             className="flex items-center px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all"
           >
             Proceed to Vote
