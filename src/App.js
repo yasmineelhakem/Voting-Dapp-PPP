@@ -1,71 +1,17 @@
-import React , { useState } from 'react';
+import React , { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { LandingPage } from './components/LandingPage';
 import { AuthForm } from './components/AuthForm';
 import { VotingPage } from './components/VotingPage';
 import { CandidatesPage } from './components/CandidatesPage';
-//import { candidatesList } from './data/CandidatesList';
+//import { candidatesList } from './constants/CandidatesList';
 import { Res } from './components/LiveResults';
+import { MetaMaskLogin } from './components/ConnectWallet';
+import {ethers} from 'ethers';
+import { contractAddress, contractAbi } from "./constants/contract_data"; 
 import ProtectedRoute from './components/ProtectedRoute';
 
-export const candidatesList = [
-  {
-    id: 1,
-    name: "Si Awab",
-    votes: 0,
-    description: "معذب قلوب البنات",
-    image: "AwabBeaugosse.jpg"
-  },
-  {
-    id: 2,
-    name: "Madame Eya",
-    votes: 0,
-    description: "زوجي حبيبي وسندي",
-    image: "AyoutaTahfouna.jpg"
-  },
-  {
-    id: 3,
-    name: "Demoiselle Amal",
-    votes: 0,
-    description: "كابستهم بنظراتي",
-    image: "AmoulTahfoun.jpg"
-  },
-  {
-    id: 4,
-    name: "Señora Yasmine",
-    votes: 0,
-    description: "حجابي و صلاتي و بلعة كي تواتي",
-    image: "mariposa.jpg"
-  },
-  {
-    id: 5,
-    name: "Patron Jadjoud",
-    votes: 0,
-    description: "على كل صوت تمرويحة بلاش لشيشتك",
-    image: "patron.jpg"
-  },
-  {
-    id: 6,
-    name: "Si Loulou",
-    votes: 0,
-    description: " We listen and we jadj",
-    image: "loulou.jpg"
-  },
-  {
-    id: 7,
-    name: "Chefa Imen",
-    votes: 0,
-    description: "لو كنت قطة حلوة كنت هبقى اكيد سيامي",
-    image: "amoun.jpg"
-  },
-  {
-    id: 8,
-    name: "Chef Janjoun",
-    votes: 0,
-    description: "كلكولاتريسي فوقي و العمال على ربي",
-    image: "janjoun.jpg"
-  }
-];
+
 
 function App() {
   const [auth, setAuth] = useState({
@@ -77,11 +23,26 @@ function App() {
     password: ''
   });
 
-  const [candidates, setCandidates] = useState(candidatesList);
-
+  const [candidates, setCandidates] = useState([]);
   const [hasVoted, setHasVoted] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState(null);
-  const handleLogin = async (e) => {
+  const [remainingTime, setremainingTime] = useState('');
+  const [votingStatus, setVotingStatus] = useState(true);
+  const [CanVote, setCanVote] = useState(true);
+
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await getCandidates();
+      await getRemainingTime();
+      await getCurrentStatus();
+    };
+    
+    fetchData();
+  }, []);
+
+  const handleLogin = async(e) => {
     e.preventDefault();
     try {
       const response = await fetch('http://127.0.0.1:5000/auth/login', {
@@ -134,30 +95,86 @@ function App() {
   };
     
     
-    const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
+const handleInputChange = (e) => {
+setFormData({
+  ...formData,
+  [e.target.name]: e.target.value
+});
+};
+
+const getCandidates = async(candidateId) => {
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    const signer = await provider.getSigner();
+    const contractInstance = new ethers.Contract(contractAddress, contractAbi, signer);
+    const candidatesList = await contractInstance.getAllVotes();
+    const formattedCandidates = candidatesList.map((candidate, index) => {
+    const voteCount = Number(ethers.toBigInt(candidate.voteCount));
+
+        return {
+          id: index,
+          name: candidate.name,
+          voteCount
+        }
     });
-    };
+    setCandidates(formattedCandidates);   
+};
 
-    // Function to delete the token from localStorage
-    const handleLogout = () => {
-    localStorage.removeItem('access_token');
-    // msh secure barsha tw nbadlouha bhal ekhr
-    setAuth({ isAuthenticated: false });
-    };
 
-  const handleVote = () => {
-    if (selectedCandidate === null) return;
-    setCandidates(candidates.map(candidate =>
-      candidate.id === selectedCandidate
-        ? { ...candidate, votes: candidate.votes + 1 }
-        : candidate
-    ));
-    setHasVoted(true);
+async function getRemainingTime() {
+  const provider = new ethers.BrowserProvider(window.ethereum);
+  await provider.send("eth_requestAccounts", []);
+  const signer = await provider.getSigner();
+  const contractInstance = new ethers.Contract (contractAddress, contractAbi, signer);
+  const time = await contractInstance.getRemainingTime();
+  setremainingTime(parseInt(time, 16));
+}
+
+const handleVote = async(candidateId) => {
+      console.log(candidateId);
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
+      const signer = await provider.getSigner();
+      const contractInstance = new ethers.Contract(contractAddress, contractAbi, signer);
+
+      const tx = await contractInstance.vote(candidateId);//yasmine remember bch thothoulna lvariable
+      await tx.wait();
+      console.log("transaction successful");
+      canVote(); //to add the address of the user who voted in the voters table
+      
   };
 
+async function canVote() {
+  const provider = new ethers.BrowserProvider(window.ethereum);
+  await provider.send("eth_requestAccounts", []);
+  const signer = await provider.getSigner();
+  const contractInstance = new ethers.Contract (
+    contractAddress, contractAbi, signer
+  );
+  const voteStatus = await contractInstance.voters(await signer.getAddress());
+  setCanVote(voteStatus);
+
+}
+
+async function getCurrentStatus() {
+  const provider = new ethers.BrowserProvider(window.ethereum);
+  await provider.send("eth_requestAccounts", []);
+  const signer = await provider.getSigner();
+  const contractInstance = new ethers.Contract (contractAddress, contractAbi, signer);
+  const status = await contractInstance.getVotingStatus();
+  console.log(status);
+  setVotingStatus(status);
+}
+
+  const connectToMetamask = () => {
+
+  };
+  // Function to delete the token from localStorage
+  const handleLogout = () => {
+  localStorage.removeItem('access_token');
+  // msh secure barsha tw nbadlouha bhal ekhr
+  setAuth({ isAuthenticated: false });
+  };
 
 
   return (
@@ -191,11 +208,11 @@ function App() {
                                      /></ProtectedRoute>} />
 
         <Route path="/Candidates" element={
-          <ProtectedRoute>
+          // <ProtectedRoute>
             <CandidatesPage
               candidates={candidates} />
-          <CandidatesPage
-                                            candidates={candidates} /></ProtectedRoute>} />
+         //</ProtectedRoute>
+         } />
                                             
         <Route path="/res" element={<ProtectedRoute><Res
                                             candidates={candidates}
@@ -206,6 +223,9 @@ function App() {
                                             setAuth={setAuth}
                                                     /></ProtectedRoute>} />
 
+
+        <Route path="/logmeta" element={<MetaMaskLogin connectWallet = {connectToMetamask}   />} />
+
       </Routes>
 
     </Router>
@@ -213,3 +233,4 @@ function App() {
 }
 
 export default App;
+
