@@ -6,8 +6,9 @@ const { buildModule } = require("@nomicfoundation/hardhat-ignition/modules");
 
 module.exports = buildModule("VotingAppModule", (m) => {
 
-  const candidates = m.getParameter("candidates", ["Ahmed Mars","Wael Znagui","Oussema Joudi","Imen Belhaj"]);
-  const VotingApp = m.contract("VotingApp", [candidates]);
+  const candidates = m.getParameter("candidates", ["Oussema Joudi"]);
+  const cids = m.getParameter("cids", ["bafkreibyefpwhq6exiiscrgwjvvrxjdps7nzguti6eyphrmp6jjt6rcyga"]);
+  const VotingApp = m.contract("VotingApp", [candidates, cids]);
 
   return { VotingApp };
 });
