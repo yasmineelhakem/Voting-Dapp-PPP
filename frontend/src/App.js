@@ -208,10 +208,10 @@ async function getCurrentStatus() {
                                      /></ProtectedRoute>} />
 
         <Route path="/Candidates" element={
-          // <ProtectedRoute>
+          <ProtectedRoute>
             <CandidatesPage
               candidates={candidates} />
-         //</ProtectedRoute>
+         </ProtectedRoute>
          } />
                                             
         <Route path="/res" element={<ProtectedRoute><Res

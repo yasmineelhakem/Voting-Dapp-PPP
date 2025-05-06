@@ -16,7 +16,7 @@ def register():
     data = request.get_json()
     if not data:
         return jsonify({"error": "Request body must be JSON"}), 400
-
+    print(data)
     username = data.get('username')
     email = data.get('email')
     password = data.get('password')
@@ -43,7 +43,9 @@ def register():
         new_user = User(username=username, email=email, password=password)
         db.session.add(new_user)
         db.session.commit()
-        return jsonify({"message": f"User '{username}' registered successfully!"}), 201 # 201 Created
+        access_token = create_access_token(identity="hello", expires_delta=False) # No expiration for simplicity
+
+        return jsonify({"message": f"User '{username}' registered successfully!",'access_token':access_token}), 201 # 201 Created
     except Exception as e:
         db.session.rollback() # Rollback in case of error
         print(f"Error during registration: {e}") # Log the error
