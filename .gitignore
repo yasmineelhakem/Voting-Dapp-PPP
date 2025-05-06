@@ -1,0 +1,3 @@
+backend/venv
+backend/migrations/__pycache__
+backend/.env
