@@ -2,12 +2,13 @@ import os
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
-basedir = os.path.abspath(os.path.dirname(__file__))
-dotenv_path = os.path.join(basedir, '..', '.env') # Points to the .env file in the root
-if os.path.exists(dotenv_path):
-    load_dotenv(dotenv_path)
-else:
-    print("Warning: .env file not found.")
+# uncomment the following line if you want to load environment variables from a .env file
+# basedir = os.path.abspath(os.path.dirname(__file__))
+# dotenv_path = os.path.join(basedir, '..', '.env') # Points to the .env file in the root
+# if os.path.exists(dotenv_path):
+#     load_dotenv(dotenv_path)
+# else:
+#     print("Warning: .env file not found.")
 
 
 class Config:

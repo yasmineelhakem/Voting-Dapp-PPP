@@ -16,7 +16,7 @@ jwt = JWTManager()
 def create_app():
     """Application Factory Function"""
     app = Flask(__name__)
-    CORS(app, resources={r"/auth/*": {"origins": "http://localhost:3000"}}, supports_credentials=True)
+    CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
     app.config.from_object(app_config) # Load configuration from config object
 

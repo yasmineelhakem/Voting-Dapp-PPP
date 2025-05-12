@@ -4,14 +4,12 @@ import { LandingPage } from './components/LandingPage';
 import { AuthForm } from './components/AuthForm';
 import { VotingPage } from './components/VotingPage';
 import { CandidatesPage } from './components/CandidatesPage';
-//import { candidatesList } from './constants/CandidatesList';
 import { Res } from './components/LiveResults';
 import { MetaMaskLogin } from './components/ConnectWallet';
-import {ethers} from 'ethers';
+import { ethers } from 'ethers';
 import { contractAddress, contractAbi } from "./constants/contract_data"; 
 import ProtectedRoute from './components/ProtectedRoute';
-
-
+import { BACKEND_URL } from './apiConfig';
 
 function App() {
   const [auth, setAuth] = useState({
@@ -30,8 +28,6 @@ function App() {
   const [votingStatus, setVotingStatus] = useState(true);
   const [CanVote, setCanVote] = useState(true);
 
-
-
   useEffect(() => {
     const fetchData = async () => {
       await getCandidates();
@@ -45,7 +41,7 @@ function App() {
   const handleLogin = async(e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://127.0.0.1:5000/auth/login', {
+      const response = await fetch(`${BACKEND_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -70,13 +66,12 @@ function App() {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://127.0.0.1:5000/auth/register', {
+      const response = await fetch(`${BACKEND_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
-          // TODO : badalaha b FormData.username kif tzidha fl form
           username: `User${Math.floor(Math.random() * 1000)}`
         }),
       });
@@ -233,4 +228,3 @@ async function getCurrentStatus() {
 }
 
 export default App;
-
