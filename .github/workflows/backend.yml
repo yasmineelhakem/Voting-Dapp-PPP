@@ -37,7 +37,7 @@ jobs:
         env:
           FLASK_APP: run.py
           FLASK_ENV: DevelopmentConfig
-        
+          DATABASE_URL: "sqlite:///:memory:"
         run: |
           python -m flask run --no-debugger --no-reload &
           sleep 10

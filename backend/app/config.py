@@ -30,7 +30,7 @@ class Config:
 
 class DevelopmentConfig(Config):
     """Development configuration."""
-    SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
+   # SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
     DEBUG = True
 
 
