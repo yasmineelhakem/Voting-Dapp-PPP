@@ -60,8 +60,11 @@ config_by_name = dict(
 
 def get_config():
     env = os.getenv('FLASK_ENV', 'testing')
+    env = env.lower()  # Normalize to lowercase
+    env= env.strip()  # Remove any leading/trailing whitespace
     print(f"Using configuration: {env}")
     config_class = config_by_name.get(env)
+ 
     return config_class()  # Return an instance
 
 # Load the appropriate config instance
