@@ -13,6 +13,8 @@ EMAIL_REGEX = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
 @auth_bp.route('/register', methods=['POST'])
 def register():
     """User registration endpoint."""
+    if not request.is_json:
+        return jsonify({"error": "Content-Type must be application/json"}), 415
     data = request.get_json()
     if not data:
         return jsonify({"error": "Request body must be JSON"}), 400
