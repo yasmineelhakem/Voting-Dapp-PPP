@@ -34,3 +34,8 @@ variable "subnet_address_prefix" {
   default     = ["10.0.1.0/24"]
 }
 
+variable "acr_name" {
+  description = "The name of the AKS cluster"
+  type        = string
+  default     = "voting-dapp-acr-cc"
+}
