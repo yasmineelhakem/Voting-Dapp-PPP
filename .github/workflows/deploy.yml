@@ -23,12 +23,34 @@ jobs:
                 login-server: votingdapprt3cc.azurecr.io
                 username: ${{ secrets.ACR_USERNAME }}
                 password: ${{ secrets.ACR_PASSWORD }}
+
             - name: Verify Docker login
               run: docker info
-              
-            - name: Build frontend image
+
+            - name: Build and push frontend image to acr 
               run: |
                 docker build -t votingdapprt3cc.azurecr.io/frontend:latest ./frontend
                 docker push votingdapprt3cc.azurecr.io/frontend:latest
+            
+            - name: Build and push backend image to acr 
+              run: |
+                docker build -t votingdapprt3cc.azurecr.io/backend:latest ./backend
+                docker push votingdapprt3cc.azurecr.io/backend:latest
+
+            - name: Get AKS credentials
+              run: az aks get-credentials --resource-group my-voting-dapp-rg --name voting-dapp-aks --overwrite-existing
+
+            - name: Create db secret
+              run: |
+                kubectl create secret generic postgres-secret \
+                --from-literal=POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
+                --from-literal=POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
+                --from-literal=POSTGRES_DB=${{ secrets.POSTGRES_DB }} \
+
+            - name: Deploy PostgreSQL
+              run: |
+                kubectl apply -f k8s/database/db-deployment.yaml
+                kubectl apply -f k8s/database/db-service.yaml
+
                 
 

@@ -21,7 +21,7 @@ resource "azurerm_subnet" "voting_dapp_subnet" {
 }
 
 resource "azurerm_kubernetes_cluster" "voting_dapp_aks" {
-  name                = "voting-dapp-aks"
+  name                = var.aks_name
   location            = azurerm_resource_group.voting_dapp_rg.location
   resource_group_name = azurerm_resource_group.voting_dapp_rg.name
   dns_prefix          = "votingdapp"

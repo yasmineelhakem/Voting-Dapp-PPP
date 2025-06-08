@@ -34,8 +34,14 @@ variable "subnet_address_prefix" {
   default     = ["10.0.1.0/24"]
 }
 
-variable "acr_name" {
+variable "aks_name" {
   description = "The name of the AKS cluster"
+  type        = string
+  default     = "voting-dapp-aks" 
+}
+
+variable "acr_name" {
+  description = "The name of the Azure Container Registry (ACR)"
   type        = string
   default     = "votingdapprt3cc" // must be globally unique and must be lowercase without special characters
 }
