@@ -24,7 +24,11 @@ jobs:
                 username: ${{ secrets.ACR_USERNAME }}
                 password: ${{ secrets.ACR_PASSWORD }}
             - name: Verify Docker login
+              run: docker info
+              
+            - name: Build frontend image
               run: |
-                docker info
-                docker logout votingdapprt3cc.azurecr.io
+                docker build -t votingdapprt3cc.azurecr.io/frontend:latest ./frontend
+                docker push votingdapprt3cc.azurecr.io/frontend:latest
+                
 
