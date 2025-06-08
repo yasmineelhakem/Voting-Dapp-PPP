@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: voting-dapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template: 
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend 
+        image: #acr here 
+        ports:
+        - containerPort: 5000 
+        env:
+        # Environment variables db url and jwt key from github secrets
