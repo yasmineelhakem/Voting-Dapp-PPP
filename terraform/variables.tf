@@ -37,5 +37,5 @@ variable "subnet_address_prefix" {
 variable "acr_name" {
   description = "The name of the AKS cluster"
   type        = string
-  default     = "voting-dapp-acr-cc"
+  default     = "votingdapprt3cc" // must be globally unique and must be lowercase without special characters
 }
