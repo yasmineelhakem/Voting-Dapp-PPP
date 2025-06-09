@@ -52,16 +52,18 @@ jobs:
             
             - name: Create db secret
               run: |
-                kubectl create secret generic postgres-secret -n voting-dapp \
+                kubectl create secret generic postgres-secret -n voting-dapp  \
                 --from-literal=POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
                 --from-literal=POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
-                --from-literal=POSTGRES_DB=${{ secrets.POSTGRES_DB }} 
+                --from-literal=POSTGRES_DB=${{ secrets.POSTGRES_DB }} \
+                --dry-run=client -o yaml | kubectl apply -f -
 
             - name : Create backend secret
               run: |
                 kubectl create secret generic backend-secret -n voting-dapp \
                 --from-literal=DATABASE_URL=${{ secrets.DATABASE_URL }} \
-                --from-literal=JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
+                --from-literal=JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} \
+                --dry-run=client -o yaml | kubectl apply -f -
             
             - name: Deploy frontend
               run: |
