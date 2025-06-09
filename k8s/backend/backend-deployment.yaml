@@ -16,6 +16,7 @@ spec:
       containers:
       - name: backend 
         image: votingdapprt3cc.azurecr.io/backend:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 5000 
         env:
@@ -23,11 +24,11 @@ spec:
           - name: DATABASE_URL
             valueFrom:
               secretKeyRef:
-                name: backend
+                name: backend-secret
                 key: DATABASE_URL
     
           - name: JWT_SECRET_KEY
             valueFrom:
               secretKeyRef:
-                name: backend
+                name: backend-secret
                 key: JWT_SECRET_KEY

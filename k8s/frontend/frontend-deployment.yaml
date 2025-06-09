@@ -16,6 +16,7 @@ spec:
       containers:
       - name: frontend
         image: votingdapprt3cc.azurecr.io/frontend:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 3000 
       
