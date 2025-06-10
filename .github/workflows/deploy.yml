@@ -79,6 +79,17 @@ jobs:
               run: |
                 kubectl apply -f k8s/backend/backend-deployment.yaml
                 kubectl apply -f k8s/backend/backend-service.yaml
-            
 
-                
+            - name: Show resources in voting-dapp namespace
+              run: |
+                kubectl get all -n voting-dapp
+            
+            - name: Describe services in voting-dapp namespace
+              run: |
+                kubectl describe svc -n voting-dapp
+
+            - name: Check pods status in voting-dapp namespace
+              run: |
+                kubectl get pods -n voting-dapp -o wide
+              
+            
