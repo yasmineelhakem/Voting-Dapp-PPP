@@ -39,37 +39,45 @@ Used for local development and validation before deployment.
 <h1 style="font-weight: bold; font-size: 1.5em; border-bottom: none !important; padding-bottom: 0 !important; margin-bottom: 0 !important;">🔄 Continuous Integration Pipelines</h1> 
 We have two GitHub Actions CI pipelines, one for each component:
 
-- Frontend CI (.github/workflows/frontend-ci.yml)
-Runs on every push to main (or PR)
-    - Installs dependencies
+- **Frontend CI** (.github/workflows/frontend-ci.yml)
+<br>Runs on pushes and PRs to main affecting the frontend/ directory.
+    - Set up Node.js
+    - Installs dependencies (npm ci)
     - Builds the React app
+    - Run unit tests (CandidatesPage.test.js)
 
-- Backend CI (.github/workflows/backend-ci.yml)
-    - Runs on every push to main (or PR)
-    - Installs dependencies
-    - Runs unit tests
-    - Validates the backend using pytest
+- **Backend CI** (.github/workflows/backend-ci.yml)
+Runs on changes to the backend/ directory or the backend workflow file.
+    - Set up Python and dependencies
+    - Runs unit tests with pytest
+    - Check if the Flask app starts correctly
 
 Each pipeline ensures code quality and consistency before building Docker images or deploying to production.
 <hr>
 <br>
 <h1 style="font-weight: bold; font-size: 1.5em; border-bottom: none !important; padding-bottom: 0 !important; margin-bottom: 0 !important;">🏗️ Infrastructure Provisioning with Terraform</h1> 
-Infrastructure is provisioned on Microsoft Azure using Terraform. The following resources are created:
+We use Terraform to provision infrastructure on Microsoft Azure, with Terraform Cloud used for remote backend and collaborative state management.<br>
+The following resources are created:
 
-- Azure Resource Group
-- Azure Kubernetes Service (AKS) with 2 nodes
-- Azure Container Registry (ACR)
-
-☁️ Terraform Cloud
-Remote backend is stored on Terraform Cloud for safe and collaborative state management.
-
-- zid ahki ala terraform cloud belgda 
+- **Azure Resource Group**: container for all infrastructure resources.
+- **Virtual Network**: isolated network environment with a defined IP space.
+- **Subnet**: subdivision of the virtual network for Kubernetes nodes.
+- **Azure Kubernetes Service (AKS)**: managed Kubernetes cluster with 2 nodes for app deployment.
+- **Azure Container Registry (ACR)**: private Docker image registry for AKS.
+- **Role Assignment**: grants AKS permission to pull images from ACR.
 
 ``` bash
 terraform init
 terraform plan
 terraform apply
 ```
+
+☁️ Terraform Cloud as Remote Backend (backend.tf)
+- The state file contains sensitive data. Storing it remotely in Terraform Cloud avoids exposing it in the Git repository.
+- Terraform Cloud ensures only one terraform apply runs at a time by locking the state file. This prevents concurrent changes that could corrupt or conflict the infrastructure.
+- All changes and history are tracked per workspace, which makes it easy to manage infrastructure as a team.
+
+![Architecture Diagram](images/archi.png)
 
 <hr>
 <br>
