@@ -36,7 +36,7 @@ Used for local development and validation before deployment.
 
 <hr>
 <br>
-<h1 style="font-weight: bold; font-size: 1.5em; border-bottom: none !important; padding-bottom: 0 !important; margin-bottom: 0 !important;">🔄 Continuous Integration Pipelines</h1> 
+<h1 style="font-weight: bold; font-size: 1.5em; border-bottom: none !important; padding-bottom: 0 !important; margin-bottom: 0 !important;"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/githubactions/githubactions-original.svg" width="24" /> Continuous Integration Pipelines</h1> 
 We have two GitHub Actions CI pipelines, one for each component:
 
 - **Frontend CI** (.github/workflows/frontend-ci.yml)
@@ -46,7 +46,7 @@ We have two GitHub Actions CI pipelines, one for each component:
     - Builds the React app
     - Run unit tests (CandidatesPage.test.js)
 
-- **Backend CI** (.github/workflows/backend-ci.yml)
+- **Backend CI** (.github/workflows/backend-ci.yml) <br>
 Runs on changes to the backend/ directory or the backend workflow file.
     - Set up Python and dependencies
     - Runs unit tests with pytest
@@ -55,7 +55,7 @@ Runs on changes to the backend/ directory or the backend workflow file.
 Each pipeline ensures code quality and consistency before building Docker images or deploying to production.
 <hr>
 <br>
-<h1 style="font-weight: bold; font-size: 1.5em; border-bottom: none !important; padding-bottom: 0 !important; margin-bottom: 0 !important;">🏗️ Infrastructure Provisioning with Terraform</h1> 
+<h1 style="font-weight: bold; font-size: 1.5em; border-bottom: none !important; padding-bottom: 0 !important; margin-bottom: 0 !important;"><img src="https://www.vectorlogo.zone/logos/terraformio/terraformio-icon.svg" width="24" /> Infrastructure Provisioning with Terraform</h1> 
 We use Terraform to provision infrastructure on Microsoft Azure, with Terraform Cloud used for remote backend and collaborative state management.<br>
 The following resources are created:
 
@@ -80,9 +80,8 @@ terraform apply
 ![Architecture Diagram](images/archi.png)
 
 <hr>
-<br>
 
-<h1 style="font-weight: bold; font-size: 1.5em; border-bottom: none !important; padding-bottom: 0 !important; margin-bottom: 0 !important;">☸️ Kubernetes Manifests
+<h1 style="font-weight: bold; font-size: 1.5em; border-bottom: none !important; padding-bottom: 0 !important; margin-bottom: 0 !important;"><img src="https://www.vectorlogo.zone/logos/kubernetes/kubernetes-icon.svg" width="24" />  Kubernetes Manifests
 </h1> 
 Kubernetes manifests define the desired state of the deployed application. They are located in the k8s/ directory and include:
 
@@ -97,9 +96,9 @@ Kubernetes manifests define the desired state of the deployed application. They 
     - postgres-service.yaml (ClusterIP)
 
 - **Secrets** 
-    - Secrets are created from GitHub Actions secrets during deployment (kubectl create secret)
-    - Database and JWT keys are injected using envFrom.secretKeyRef
-    - TODO: add details
+    - Sensitive information are managed securely using Kubernetes Secrets. These secrets are created automatically during deployment (kubectl create secret) by GitHub Actions, which pulls the secret values stored in the repository’s GitHub Actions secrets.
+    - For the backend service, important secrets like the **database url** and **JWT key** are injected into the deployment using Kubernetes secretKeyRef mechanism, allowing the application to access them as environment variables without exposing them in the code.
+    - Similarly, for the PostgreSQL database deployment, the **username**, **password**, and **database name** are provided via Kubernetes secrets to ensure credentials remain confidential and are only accessible to the database pod.
 
 - **Namespace**
     - All resources are deployed into a custom namespace (voting-dapp) for isolation and better organization.
@@ -109,7 +108,7 @@ Kubernetes manifests define the desired state of the deployed application. They 
 <hr>
 <br>
 
-<h1 style="font-weight: bold; font-size: 1.5em; border-bottom: none !important; padding-bottom: 0 !important; margin-bottom: 0 !important;">🚀 Continuous Deployment Pipeline
+<h1 style="font-weight: bold; font-size: 1.5em; border-bottom: none !important; padding-bottom: 0 !important; margin-bottom: 0 !important;"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/githubactions/githubactions-original.svg" width="26" /> Continuous Deployment Pipeline
 </h1> 
 A single CD pipeline (deploy.yml) handles:
 
@@ -119,69 +118,8 @@ A single CD pipeline (deploy.yml) handles:
 - Create secrets using kubectl
 - Apply Kubernetes manifests
 
-## TODO: Graph with mermaids
+<br>
 
-```mermaid
-%%{ 
-  init: { 
-    "theme": "default", 
-    "themeVariables": { 
-      "fontSize": "20px", 
-      "nodePadding": "50", 
-      "edgeLabelBackground":"#ffffff" 
-    } 
-  } 
-}%%
+![Architecture Diagram](images/graph.png)
 
-graph TD
-    classDef default minWidth:300px
-
-    %% Trigger
-    T["📥 GitHub Push to main"] --> CI["🔁 GitHub Actions CI"]
-    CI --> Test["🧪 Run Tests (Backend/Frontend)"]
-    Test --> CD["🚀 GitHub Actions CD"]
-
-    %% Terraform Infrastructure
-    CD --> TF["🏗️ Terraform Apply"]
-    TF -->|Provisions| AKS["☁️ Azure AKS Cluster"]
-    TF --> ACR["📦 Azure Container Registry"]
-
-    %% Docker Build & Push
-    CD --> Build["🐳 Docker Build Images"]
-    Build --> Push["📤 Push Images to ACR"]
-
-    %% K8s Deploy
-    Push --> K8S["☸️ kubectl apply (K8s Manifests)"]
-    K8S --> Secrets["🔐 Create Secrets"]
-    Secrets --> DB["🗄️ Deploy PostgreSQL"]
-    K8S --> BE["⚙️ Deploy Backend"]
-    K8S --> FE["🖥️ Deploy Frontend"]
-
-    %% App Flow
-    FE -->|API Calls| BE
-    BE -->|DB Queries| DB
-    FE --> User["✅ Users Access the App"]
-
-    %% Styling
-
-    classDef trigger fill:#fff7e6,stroke:#ffa500,color:#000;
-    classDef ci fill:#e6f7ff,stroke:#1890ff,color:#000;
-    classDef infra fill:#e6fffb,stroke:#13c2c2,color:#000;
-    classDef docker fill:#f9f0ff,stroke:#9254de,color:#000;
-    classDef k8s fill:#f6ffed,stroke:#52c41a,color:#000;
-    classDef app fill:#fff0f6,stroke:#eb2f96,color:#000;
-    classDef user fill:#fffbe6,stroke:#fadb14,color:#000;
-
-    class T trigger;
-    class CI,Test,CD ci;
-    class TF,AKS,ACR infra;
-    class Build,Push docker;
-    class K8S,Secrets,DB,BE,FE k8s;
-    class User user;
-
-
-```
-
-   
-   
 
